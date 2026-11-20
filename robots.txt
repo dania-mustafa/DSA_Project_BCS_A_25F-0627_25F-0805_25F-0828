@@ -1,0 +1,5 @@
+RB01 Picker 85.0 10.0 L01
+RB02 Picker 90.0 15.0 L03
+RB03 Carrier 75.0 20.0 L04
+RB04 Heavy-duty 95.0 40.0 L07
+RB05 Carrier 15.0 25.0 L11
