@@ -82,19 +82,6 @@ A manually implemented LIFO stack maintains history of reversible administrative
 
 ---
 
-## Project Structure
-.
-├── main.cpp # Complete source code (all modules)
-├── warehouse.txt # Warehouse layout data (locations and pathways)
-├── products.txt # Product inventory data
-├── robots.txt # Robot fleet data
-├── orders.txt # Customer order data
-└── README.md # This file
-
-> Note: Input file names may vary. Ensure the files are in the same directory as the executable.
-
----
-
 ### Requirements
 - C++ compiler (g++, clang++, or MSVC)
 - C++11 or later
