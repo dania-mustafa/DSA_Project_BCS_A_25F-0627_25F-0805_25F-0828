@@ -13,7 +13,6 @@ All data structures are implemented manually without using STL containers. Dynam
 - [Features](#features)
 - [Modules Overview](#modules-overview)
 - [Data Structures Used](#data-structures-used)
-- [Project Structure](#project-structure)
 - [Design Decisions](#design-decisions)
 - [Usage Guide](#usage-guide)
 - [Course Information](#course-information)
@@ -110,6 +109,9 @@ A manually implemented LIFO stack maintains history of reversible administrative
 ### Course Information
 
 Course: Data Structures (CL2001)
+
 Project: Intelligent Warehouse Robot and Automated Order Fulfillment System
+
 Semester: Fall 2026
+
 Institution: FAST-NUCES, CFD Campus
