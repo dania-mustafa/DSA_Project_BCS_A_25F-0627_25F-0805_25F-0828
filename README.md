@@ -14,11 +14,10 @@ All data structures are implemented manually without using STL containers. Dynam
 - [Modules Overview](#modules-overview)
 - [Data Structures Used](#data-structures-used)
 - [Project Structure](#project-structure)
-- [How to Compile and Run](#how-to-compile-and-run)
-- [Input File Format](#input-file-format)
+- [Design Decisions](#design-decisions)
 - [Usage Guide](#usage-guide)
-- [Rules and Constraints](#rules-and-constraints)
-- [Authors](#authors)
+- [Course Information](#course-information)
+- [Requirements](#requirements)
 
 ---
 
