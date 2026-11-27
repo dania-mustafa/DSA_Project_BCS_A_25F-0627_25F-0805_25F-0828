@@ -236,3 +236,161 @@ public:
         cout << string(72, '-') << "\n";
     }
 };
+
+// ============================================================================
+// SECTION 15 : WAREHOUSE CONTROLLER — MODULE 3 MENU (orderMenu)
+// ============================================================================
+
+// MODULE 3 MENU: Customer Order Management
+void Warehouse::orderMenu()
+{
+    int c;
+    do
+    {
+        cout << "\n--- MODULE 3: CUSTOMER ORDER MANAGEMENT ---\n"
+            << "1. Add a new customer order\n"
+            << "2. Add product(s) to a Pending order\n"
+            << "3. Search for an order by ID\n"
+            << "4. Display pending order queue (Front to Rear)\n"
+            << "5. View front order of queue (Peek) and queue size\n"
+            << "6. Cancel an order\n"
+            << "7. Display orders (Pending / Completed / All)\n"
+            << "0. Back to main menu\n";
+        c = readInt("Choice: ", 0, 7);
+
+        string id, cust, pid;
+        int q;
+
+        if (c == 1)
+        {
+            id = readLine("Order ID (O##): ");
+            cust = readLine("Customer ID (CU##): ");
+            if (!validId(id, "O") || !validId(cust, "CU"))
+            {
+                cout << "Invalid ID format. Order must be O## and Customer must be CU##.\n";
+            }
+            else if (findOrder(id))
+            {
+                cout << "Duplicate Order ID rejected.\n";
+            }
+            else
+            {
+                Order* o = new Order(id, cust);
+                int count = readInt("How many products to add now? (0 to add later): ", 0, 100);
+                for (int k = 0; k < count; k++)
+                {
+                    pid = readLine("  Product ID (P##): ");
+                    q = readInt("  Quantity: ", 1, 1000000);
+                    if (addItem(o, pid, q))
+                        cout << "  -> Added/merged " << q << " units of " << pid << ".\n";
+                    else
+                        cout << "  -> Product " << pid << " not found in AVL tree; skipped.\n";
+                }
+                appendOrder(o);
+                pending.enqueue(o);
+                cout << "Order " << id << " created and enqueued at rear of pending queue.\n";
+            }
+        }
+        else if (c == 2)
+        {
+            id = readLine("Order ID (O##): ");
+            Order* o = findOrder(id);
+            if (!o)
+                cout << "Order not found.\n";
+            else if (o->status != "Pending" || o->hasStartedAnyTrip())
+                cout << "Items can only be added to a Pending order that has not started any delivery.\n";
+            else
+            {
+                int count = readInt("How many product entries to add? ", 1, 100);
+                for (int k = 0; k < count; k++)
+                {
+                    pid = readLine("  Product ID (P##): ");
+                    q = readInt("  Quantity: ", 1, 1000000);
+                    if (addItem(o, pid, q))
+                        cout << "  -> Item " << pid << " (qty " << q << ") added/merged.\n";
+                    else
+                        cout << "  -> Could not add item (Product " << pid << " does not exist).\n";
+                }
+            }
+        }
+        else if (c == 3)
+        {
+            id = readLine("Order ID: ");
+            Order* o = findOrder(id);
+            if (!o)
+                cout << "Order not found.\n";
+            else
+                showOrder(o);
+        }
+        else if (c == 4)
+        {
+            cout << "\n--- PENDING ORDERS QUEUE (Front to Rear) ---\n";
+            pending.display();
+        }
+        else if (c == 5)
+        {
+            Order* o = pending.peek();
+            if (o)
+                cout << "Front of Queue (Peek): " << o->id << " (Customer: " << o->customer << ")\n";
+            else
+                cout << "Pending queue is empty.\n";
+            cout << "Total Queue Size     : " << pending.size() << "\n";
+        }
+        else if (c == 6)
+        {
+            id = readLine("Order ID to cancel: ");
+            Order* o = findOrder(id);
+            if (!o)
+            {
+                cout << "Order not found.\n";
+            }
+            else if (o->status == "Partially Fulfilled" || o->status == "Completed" || o->status == "Cancelled")
+            {
+                cout << "Cannot cancel order with status '" << o->status << "'.\n";
+            }
+            else if (o->hasStartedAnyTrip())
+            {
+                cout << "Cannot cancel order: at least one delivery trip has already been executed.\n";
+            }
+            else
+            {
+                pending.remove(o->id);
+                releaseReservations(o);
+
+                if (!o->assignedRobot.empty())
+                {
+                    Robot* r = findRobot(o->assignedRobot);
+                    if (r)
+                    {
+                        r->task = "";
+                        r->status = (r->battery < CHARGE_THRESHOLD) ? "Waiting for Charging" : "Available";
+                    }
+                    o->assignedRobot = "";
+                }
+
+                o->clearPlan();
+                o->status = "Cancelled";
+                cout << "Order " << o->id << " cancelled. Reserved stock and assigned robot (if any) released.\n";
+            }
+        }
+        else if (c == 7)
+        {
+            int filter = readInt("Filter (1 = Pending, 2 = Completed, 3 = All orders): ", 1, 3);
+            bool any = false;
+            cout << string(78, '-') << "\n";
+            for (Order* o = orders; o; o = o->next)
+            {
+                if (filter == 3 ||
+                    (filter == 1 && o->status == "Pending") ||
+                    (filter == 2 && o->status == "Completed"))
+                {
+                    showOrder(o);
+                    cout << string(78, '-') << "\n";
+                    any = true;
+                }
+            }
+            if (!any)
+                cout << "No matching orders found.\n";
+        }
+    } while (c != 0);
+}
